@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # add glfw folder into the build
 add_subdirectory(lib/glfw)
+# add_definitions(-DGL_SILENCE_DPRECAT)
 
 if(APPLE) 
   list(APPEND EXTRA_LIBS 
