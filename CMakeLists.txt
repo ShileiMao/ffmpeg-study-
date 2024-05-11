@@ -5,7 +5,10 @@ set(CMAKE_CXX_STANDARD 14)
 
 # add glfw folder into the build
 add_subdirectory(lib/glfw)
-# add_definitions(-DGL_SILENCE_DPRECAT)
+# add ffmpeg into the build
+add_subdirectory(lib/ffmpeg)
+
+# add_definitions(-DGL_SILENCE_DEPRECATION)
 
 if(APPLE) 
   list(APPEND EXTRA_LIBS 
@@ -22,7 +25,11 @@ else() # linux
   )
 endif()
 
-add_executable(player src/main.cpp)
+list(APPEND SOURCES
+  src/main.cpp
+  src/load_frame.cpp
+)
+add_executable(player ${SOURCES})
 
 # link the glfw library 
-target_link_libraries(player glfw ${EXTRA_LIBS})
+target_link_libraries(player FFmpeg glfw ${EXTRA_LIBS})
