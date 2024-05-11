@@ -1,0 +1,7 @@
+Target dependency graph (3 targets)
+Target 'player' in project 'player'
+➜ Explicit dependency on target 'glfw' in project 'player'
+➜ Explicit dependency on target 'ZERO_CHECK' in project 'player'
+Target 'glfw' in project 'player'
+➜ Explicit dependency on target 'ZERO_CHECK' in project 'player'
+Target 'ZERO_CHECK' in project 'player' (no dependencies)

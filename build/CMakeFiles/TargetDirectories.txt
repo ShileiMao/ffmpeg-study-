@@ -1,0 +1,12 @@
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/CMakeFiles/player.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/CMakeFiles/install.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/CMakeFiles/ALL_BUILD.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/CMakeFiles/ZERO_CHECK.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/CMakeFiles/uninstall.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/CMakeFiles/install.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/CMakeFiles/ALL_BUILD.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/CMakeFiles/ZERO_CHECK.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/src/CMakeFiles/glfw.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/src/CMakeFiles/update_mappings.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/src/CMakeFiles/install.dir
+/Users/shileimao/Documents/Programming Languages/C++/player/player/build/lib/glfw/docs/CMakeFiles/install.dir
