@@ -16,6 +16,7 @@ extern "C" {
   #include <inttypes.h>
 }
 
+
 bool load_frame(const char* filename, int* width, int* height, unsigned char** data){
   AVFormatContext * av_format_ctx = avformat_alloc_context();
   if(!av_format_ctx) {
@@ -32,6 +33,10 @@ bool load_frame(const char* filename, int* width, int* height, unsigned char** d
   int video_stream_index = -1;
   AVCodecParameters* av_codec_params = NULL;
   const AVCodec* av_codec;
+  AVCodecContext* av_codec_ctx = NULL;
+  AVFrame* av_frame = NULL;
+  AVPacket* av_packet = NULL;
+  SwsContext* sws_scaler_ctx = NULL;
   
   for(int i = 0; i < av_format_ctx->nb_streams; i ++) {
     auto stream = av_format_ctx->streams[i];
@@ -59,7 +64,7 @@ bool load_frame(const char* filename, int* width, int* height, unsigned char** d
   }
   
   // setup a codex contex for the decoder
-  AVCodecContext* av_codec_ctx = avcodec_alloc_context3(av_codec);
+  av_codec_ctx = avcodec_alloc_context3(av_codec);
   if(!av_codec_ctx) {
     printf("Couldn't create AVCodecContext\n");
     return false;
@@ -76,13 +81,13 @@ bool load_frame(const char* filename, int* width, int* height, unsigned char** d
   }
   
   // decode the data
-  AVFrame* av_frame = av_frame_alloc();
+  av_frame = av_frame_alloc();
   if(!av_frame) {
     printf("Coulnd't allocate AVPackte\n");
     return false;
   }
   
-  AVPacket* av_packet = av_packet_alloc();
+  av_packet = av_packet_alloc();
   if(!av_packet) {
     printf("Couldn't allocate AVPacket\n");
     return false;
@@ -126,7 +131,7 @@ bool load_frame(const char* filename, int* width, int* height, unsigned char** d
   //  }
   
   // convert to RGB color, you can scale the image size from here as well
-  SwsContext* sws_scaler_ctx = sws_getContext(av_frame->width, av_frame->height, av_codec_ctx->pix_fmt,
+  sws_scaler_ctx = sws_getContext(av_frame->width, av_frame->height, av_codec_ctx->pix_fmt,
                                               av_frame->width, av_frame->height,AV_PIX_FMT_RGB0,
                                               SWS_BILINEAR, NULL, NULL, NULL);
   

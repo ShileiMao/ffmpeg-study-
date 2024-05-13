@@ -27,7 +27,10 @@ endif()
 
 list(APPEND SOURCES
   src/main.cpp
-  src/load_frame.cpp
+  src/video_reader.hpp
+  src/video_reader.cpp
+  src/render_color.hpp
+  src/render_color.cpp
 )
 add_executable(player ${SOURCES})
 
