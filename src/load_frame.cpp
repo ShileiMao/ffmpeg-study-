@@ -29,6 +29,13 @@ bool load_frame(const char* filename, int* width, int* height, unsigned char** d
     return false;
   }
 
+
+  if(avformat_find_stream_info(av_format_ctx, NULL) != 0) {
+    printf("Couldn't find the stream info\n");
+    return false;
+  }
+
+
   // find the first valid video stream from the file
   int video_stream_index = -1;
   AVCodecParameters* av_codec_params = NULL;
