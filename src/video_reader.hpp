@@ -22,11 +22,11 @@ struct VideoReaderState {
   uint8_t* frame_buffer;
 
   // private internal state
-  AVFormatContext* av_format_ctx;
-  AVCodecContext* av_codec_ctx;
-  int video_stream_index;
-  AVFrame* av_frame;
-  AVPacket* av_packet;
+  AVFormatContext* av_format_ctx = NULL;
+  AVCodecContext* av_codec_ctx = NULL;
+  int video_stream_index = -1;
+  AVFrame* av_frame = NULL;
+  AVPacket* av_packet = NULL;
   SwsContext* sws_scaler_ctx = NULL;
 };
 

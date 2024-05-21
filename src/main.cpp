@@ -53,7 +53,7 @@ int main() {
 //  uint8_t end_color[4] = {31, 72, 234, 0};
 //  frame_width = 255;
 //  frame_height = 255;
-
+//
 //  generate_gradient(start_color, end_color, test_gradient);
 
   while(!glfwWindowShouldClose(window)) {
