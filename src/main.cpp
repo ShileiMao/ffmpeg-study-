@@ -17,14 +17,10 @@ int main() {
     return 1;
   }
 
- 
-//   const char* filename = "/Users/shileimao/Downloads/20211028_151916.mp4";
-//  const char* filename = "/Users/shileimao/Downloads/【黑猫警长】1 痛歼搬仓鼠.mp4";
-  const char* filename = "/Users/shileimao/Downloads/【童年回忆杀】动画城片头合集.mp4";
-  VideoReaderState vr_state;
-
-  if(!video_reader_open(&vr_state, filename)) {
-    printf("Failed to open file\n");
+  int frame_width, frame_height;
+  unsigned char* frame_data;
+  if(!load_frame("../tests/resources/file_example_MP4_480_1_5MG.mp4", &frame_width, &frame_height, &frame_data)) {
+    printf("Failed to load frame data!\n");
     return 1;
   }
 

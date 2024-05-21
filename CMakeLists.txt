@@ -21,7 +21,7 @@ elseif(WIN32)
   set(CMAKE_EXE_LINKER_FLAGS "-std=gnu99 -static -static-libgcc -static-libstdc++ -mwindows")
 else() # linux
   list(APPEND EXTRA_LIBS 
-    "-lGL -lGLU -lX11"
+    "-lGL -lX11"
   )
 endif()
 

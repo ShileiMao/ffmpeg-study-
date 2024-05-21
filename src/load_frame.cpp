@@ -16,6 +16,9 @@ extern "C" {
   #include <inttypes.h>
 }
 
+#undef av_err2str
+#define av_err2str(errnum) av_make_error_string((char*)__builtin_alloca(AV_ERROR_MAX_STRING_SIZE), AV_ERROR_MAX_STRING_SIZE, errnum)
+
 
 bool load_frame(const char* filename, int* width, int* height, unsigned char** data){
   AVFormatContext * av_format_ctx = avformat_alloc_context();
@@ -30,10 +33,10 @@ bool load_frame(const char* filename, int* width, int* height, unsigned char** d
   }
 
 
-  if(avformat_find_stream_info(av_format_ctx, NULL) != 0) {
-    printf("Couldn't find the stream info\n");
-    return false;
-  }
+  // if(avformat_find_stream_info(av_format_ctx, NULL) != 0) {
+  //   printf("Couldn't find the stream info\n");
+  //   return false;
+  // }
 
 
   // find the first valid video stream from the file
