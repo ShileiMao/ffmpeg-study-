@@ -1,11 +1,16 @@
 #include<stdio.h>
-#include <GLFW/glfw3.h>
 #include "video_reader.hpp"
 #include "render_color.hpp"
+#include "gui/Window.hpp"
 
 bool load_frame(const char* filename, int* width, int* height, unsigned char** data);
 
 int main() {
+
+  Window window = Window(1080, 640, "Hello world");
+  window.showWindow();
+
+  /*
   GLFWwindow *window;
   if(!glfwInit()) {
     printf("Failed to init GLFW\n");
@@ -18,8 +23,16 @@ int main() {
   }
 
   int frame_width, frame_height;
+  const char* file_name = "../tests/resources/file_example_MP4_480_1_5MG.mp4";
   unsigned char* frame_data;
-  if(!load_frame("../tests/resources/file_example_MP4_480_1_5MG.mp4", &frame_width, &frame_height, &frame_data)) {
+  VideoReaderState vr_state;
+
+  if(!video_reader_open(&vr_state, file_name)) {
+    printf("Failed to open file\n");
+    return 1;
+  }
+
+  if(!load_frame(file_name, &frame_width, &frame_height, &frame_data)) {
     printf("Failed to load frame data!\n");
     return 1;
   }
@@ -40,17 +53,17 @@ int main() {
   //  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
   // allocate frame buffer
-  int frame_width = vr_state.width;
-  int frame_height = vr_state.height;
-  uint8_t* frame_data = new uint8_t[frame_width * frame_height * 3];
+  frame_width = vr_state.width;
+  frame_height = vr_state.height;
+  frame_data = new uint8_t[frame_width * frame_height * 3];
   
-//  uint8_t* test_gradient = new uint8_t[255 * 255 * 4];
-//  uint8_t start_color[4] = {199, 184, 34, 0};
-//  uint8_t end_color[4] = {31, 72, 234, 0};
-//  frame_width = 255;
-//  frame_height = 255;
-//
-//  generate_gradient(start_color, end_color, test_gradient);
+  uint8_t* test_gradient = new uint8_t[255 * 255 * 4];
+  uint8_t start_color[4] = {199, 184, 34, 0};
+  uint8_t end_color[4] = {31, 72, 234, 0};
+  frame_width = 255;
+  frame_height = 255;
+
+  generate_gradient(start_color, end_color, test_gradient);
 
   while(!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -70,7 +83,7 @@ int main() {
      }
     
     glBindTexture(GL_TEXTURE_2D, tex_handle);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, frame_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, test_gradient);
 
 
 
@@ -94,6 +107,8 @@ int main() {
 
   video_reader_close(&vr_state);
   video_reader_free(&vr_state);
+
+  */
 
   return 0;
 }

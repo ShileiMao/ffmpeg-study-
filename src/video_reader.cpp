@@ -1,5 +1,8 @@
 #include "video_reader.hpp"
 
+#undef av_err2str
+#define av_err2str(errnum) av_make_error_string((char*)__builtin_alloca(AV_ERROR_MAX_STRING_SIZE), AV_ERROR_MAX_STRING_SIZE, errnum)
+
 static AVPixelFormat correct_for_deprecated_pixel_format(AVPixelFormat pix_fmt) {
     // Fix swscaler deprecated pixel format warning
     // (YUVJ has been deprecated, change pixel format to regular YUV)
@@ -22,32 +25,29 @@ bool video_reader_open(VideoReaderState* state, const char* filename) {
   auto& width = state->width;
   auto& height = state->height;
 
-//  av_format_ctx = avformat_alloc_context();
-//  if(!av_format_ctx) {
-//    printf("Could not read AVFormatContext\n");
-//    return false;
-//  }
+ av_format_ctx = avformat_alloc_context();
+ if(!av_format_ctx) {
+   printf("Could not read AVFormatContext\n");
+   return false;
+ }
 
   if(avformat_open_input(&av_format_ctx, filename, NULL, NULL) != 0) {
     printf("Couldn't open video file\n");
     return false;
   }
-
+  
+  if(avformat_find_stream_info(av_format_ctx, NULL) != 0) {
+    printf("Unable to find video stream!\n");
+    return false;
+  }
 
   // find the first valid video stream from the file
   video_stream_index = -1;
   AVCodecParameters* av_codec_params = NULL;
-  const AVCodec* av_codec;
   
   for(int i = 0; i < av_format_ctx->nb_streams; i ++) {
     auto stream = av_format_ctx->streams[i];
     av_codec_params = av_format_ctx->streams[i]->codecpar;
-    av_codec = avcodec_find_decoder(av_codec_params->codec_id);
-    
-    if(!av_codec) {
-      // not support codec
-      continue;
-    }
     
     if(av_codec_params->codec_type == AVMEDIA_TYPE_VIDEO) {
       video_stream_index = i;
@@ -67,13 +67,21 @@ bool video_reader_open(VideoReaderState* state, const char* filename) {
   }
   
   // setup a codex contex for the decoder
+  const AVCodec* av_codec;
+  av_codec = avcodec_find_decoder(av_codec_params->codec_id);
+  if(!av_codec) {
+    // not support codec
+    printf("Unsupported codedc\n");
+    return false;
+  }
+    
   av_codec_ctx = avcodec_alloc_context3(av_codec);
   if(!av_codec_ctx) {
     printf("Couldn't create AVCodecContext\n");
     return false;
   }
-  
-  if(avcodec_parameters_to_context(av_codec_ctx, av_codec_params) < 0) {
+
+  if(avcodec_parameters_to_context(av_codec_ctx, av_format_ctx->streams[video_stream_index]->codecpar) < 0) {
     printf("Couldn't initialize AVCodecContext\n");
     return false;
   }
@@ -83,18 +91,10 @@ bool video_reader_open(VideoReaderState* state, const char* filename) {
     return false;
   }
   
-  // decode the data
-  av_frame = av_frame_alloc();
-  if(!av_frame) {
-    printf("Coulnd't allocate AVPackte\n");
-    return false;
-  }
-  
-  av_packet = av_packet_alloc();
-  if(!av_packet) {
-    printf("Couldn't allocate AVPacket\n");
-    return false;
-  }
+  width = av_codec_ctx->width;
+  height = av_codec_ctx->height;
+
+  printf("width: %d (%d), height: %d (%d)\n", av_codec_params->width, av_codec_ctx->width, av_codec_params->height, av_codec_ctx->height);
 
   return true;
 }
@@ -109,6 +109,20 @@ bool video_reader_read_frame(VideoReaderState* state, uint8_t* frame_buffer) {
   auto& width = state->width;
   auto& height = state->height;
   
+
+  // decode the data
+  av_frame = av_frame_alloc();
+  if(!av_frame) {
+    printf("Coulnd't allocate AVPackte\n");
+    return false;
+  }
+  
+  av_packet = av_packet_alloc();
+  if(!av_packet) {
+    printf("Couldn't allocate AVPacket\n");
+    return false;
+  }
+
   int resp = 0;
   do {
     printf("*** read package ***\n");
@@ -116,23 +130,27 @@ bool video_reader_read_frame(VideoReaderState* state, uint8_t* frame_buffer) {
     
     if(av_packet->stream_index != video_stream_index) {
       // we skip if this is not video stream
+      av_packet_unref(av_packet);
       continue;
     }
     
     int response = avcodec_send_packet(av_codec_ctx, av_packet);
     if(response < 0) {
       printf("Failed to decode packet 1: %s\n", av_err2str(response));
+      av_packet_unref(av_packet);
       return false;
     }
     
     response = avcodec_receive_frame(av_codec_ctx, av_frame);
     if(response == AVERROR(EAGAIN) || response == AVERROR_EOF) {
       printf("");
+      av_packet_unref(av_packet);
       continue;
     }
     
     if(response < 0) {
       printf("Failed to decode packet: %s\n", av_err2str(response));
+      av_packet_unref(av_packet);
       return false;
     }
     
