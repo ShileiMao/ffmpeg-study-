@@ -110,55 +110,14 @@ void Window::showWindow()
   glfwSwapInterval(1);
 
   // create shader object
-  GLuint vertex_shader;
-  vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  // attach the shader source code to the shader object and compile the shader;
-  glShaderSource(vertex_shader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertex_shader);
-  // check if the compile is successfull
-  int success;
-  char infoLog[512];
-  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-  if(!success) {
-    glGetShaderInfoLog(vertex_shader, 512, NULL, infoLog);
-    cout << "Shader compile error: "<< infoLog<<endl;
-  }
-
-  // crete fragment shader
-  GLuint fragment_shader;
-  fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragment_shader);
-  success = false;
-  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-  if(!success) {
-    glGetShaderInfoLog(fragment_shader, 512, NULL, infoLog);
-    cout << "Shader compile error 2: "<< infoLog<<endl;
-  }
-
-  // link shaders
-  GLuint shader_program;
-  shader_program = glCreateProgram();
-  glAttachShader(shader_program, vertex_shader);
-  glAttachShader(shader_program, fragment_shader);
-  glLinkProgram(shader_program);
-  // check link shaders errors
-  glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-  if(!success) {
-    glGetProgramInfoLog(shader_program, 512, NULL, infoLog);
-    cout <<"Error linking program: "<<infoLog<<endl;
-  }
-
-  // delete shader object once we linked them into the program object, we no longer need them anymore
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
-
+  Shader myShader("resources/gl/shaders/vertex.vs", "resources/gl/shaders/fragment.fs");
 
   // setup vertex data (and buffer(s)) and configure vertex attributes
   float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f, 
-     0.0f,  0.5f, 0.0f
+    // vertices           // colors
+    -0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, // bottom left
+     0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // bottom right
+     0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f// top
   };
 
   float rectangle_vertices[] = {
@@ -179,7 +138,7 @@ void Window::showWindow()
   // generate a buffer with buffer ID
   glGenVertexArrays(1, &vertex_array_object);
   glGenBuffers(1, &vertex_buffer_object);
-  glGenBuffers(1, &element_buffer_object);
+  // glGenBuffers(1, &element_buffer_object);
   
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
   glBindVertexArray(vertex_array_object);
@@ -195,10 +154,10 @@ void Window::showWindow()
   // - GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times
   // - GL_STATIC_DRAW: the data is set only once and used many times
   // - GL_DYNAMIC_DRAW: the data is changed a lot and used many times.
-  glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle_vertices), rectangle_vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
   
   // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -228,13 +187,10 @@ void Window::showWindow()
     float red_value = (cos(time_value) / 2.0f);
     float blue_value = sin(time_value);
 
-    int vertex_color_location = glGetUniformLocation(shader_program, "ourColor");
-    
-    glUniform4f(vertex_color_location, red_value, green_value, blue_value, 1.0f);
-    glUseProgram(shader_program);
+    myShader.use();
     glBindVertexArray(vertex_array_object);
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glBindVertexArray(0);
 

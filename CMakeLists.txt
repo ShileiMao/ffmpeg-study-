@@ -38,8 +38,18 @@ list(APPEND SOURCES
   src/load_frame.cpp
   src/gui/Window.hpp 
   src/gui/Window.cpp
+  src/gui/gl/Shader.hpp
+  src/gui/gl/Shader.cpp
 )
 add_executable(player ${SOURCES})
 
 # link the glfw library 
 target_link_libraries(player FFmpeg glfw glad ${EXTRA_LIBS})
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tests/resources/gl/shaders/fragment.fs
+  ${CMAKE_CURRENT_BINARY_DIR}/resources/gl/shaders/fragment.fs COPYONLY
+)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tests/resources/gl/shaders/vertex.vs
+  ${CMAKE_CURRENT_BINARY_DIR}/resources/gl/shaders/vertex.vs COPYONLY
+)

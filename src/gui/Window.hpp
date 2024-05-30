@@ -6,6 +6,7 @@
 #include <linmath.h>
 #include <functional>
 #include <iostream>
+#include "gl/Shader.hpp"
 
 class Window {
 	public: 

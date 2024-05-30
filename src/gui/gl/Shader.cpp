@@ -16,7 +16,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
   {
     // open files
     vShaderFile.open(vertexPath);
-    vShaderFile.open(fragmentPath);
+    fShaderFile.open(fragmentPath);
     std::stringstream vShaderStream, fShaderStream;
     // read file's buffer contents into streams
     vShaderStream << vShaderFile.rdbuf();
@@ -30,11 +30,15 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
   } 
   catch (std::ifstream::failure e) 
   {
-    std::cout << "Error::shader::FILE_NOT_SUCCESSFULY_READ"<<std::endll;
+    std::cout << "Error::shader::FILE_NOT_SUCCESSFULY_READ"<<std::endl;
+    std::cout <<e.what()<<std::endl;
   }
 
   const char* vShaderCode = vertexCode.c_str();
   const char* fShaderCode = fragmentCode.c_str();
+
+  std::cout<<"vShaderCode: "<<vShaderCode<<std::endl;
+  std::cout<<"fShaderCode: "<<fShaderCode<<std::endl;
 
   // 2. compile shaders
   unsigned int vertex, fragment;
@@ -100,5 +104,5 @@ void Shader::setInt(const std:: string &name, int value) const
 
 void Shader::setFloat(const std::string &name, float value) const 
 {
-  glUniform1f(glGetUniformLocation(ID, name.c_str(), value));
+  glUniform1f(glGetUniformLocation(ID, name.c_str()),  value);
 }

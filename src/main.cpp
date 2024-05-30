@@ -2,11 +2,18 @@
 #include "video_reader.hpp"
 #include "render_color.hpp"
 #include "gui/Window.hpp"
+#include <unistd.h>
+#include <iostream>
 
 bool load_frame(const char* filename, int* width, int* height, unsigned char** data);
 
 int main() {
 
+  char cwd[1024];
+  if(getcwd(cwd, sizeof(cwd)) != NULL) 
+  {
+    std::cout<< "Current working directory: "<< cwd<<std::endl;
+  }
   Window window = Window(1080, 640, "Hello world");
   window.showWindow();
 
