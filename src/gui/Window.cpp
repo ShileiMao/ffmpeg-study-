@@ -1,5 +1,8 @@
 #include "Window.hpp"
 #include<iostream>
+#define STB_IMAGE_IMPLEMENTATION
+#include "../utils/stb_image.h"
+
 
 using namespace std; 
 
@@ -112,20 +115,12 @@ void Window::showWindow()
   // create shader object
   Shader myShader("resources/gl/shaders/vertex.vs", "resources/gl/shaders/fragment.fs");
 
-  // setup vertex data (and buffer(s)) and configure vertex attributes
-  float vertices[] = {
-    // vertices           // colors
-    -0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, // bottom left
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // bottom right
-     0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f// top
-  };
-
   float rectangle_vertices[] = {
-      // positions           // colors
-      0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // top right
-      0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // bottom right
-      -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,// bottom left
-      -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top left 
+      // positions           // colors        // texture coods
+      0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // top right
+      0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  // bottom right
+      -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f,  // bottom left
+      -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f   // top left 
   };
 
   unsigned int indices[] = {  // we start from 0!
@@ -133,12 +128,20 @@ void Window::showWindow()
     1, 2, 3   // second triangle
   };
 
+  // texture coordinates
+  // texture start at 0,0 at the bottom left, 1,1 at the top right
+  float texCoods[] = {
+    0.0f, 0.0f, // lower left corner
+    1.0f, 0.0f, // lower right corner
+    0.5f, 1.0f  // top center corner
+  };
 
-  GLuint vertex_buffer_object, vertex_array_object, element_buffer_object;
+  GLuint vertex_buffer_object, vertex_array_object, element_buffer_object, texture;
   // generate a buffer with buffer ID
   glGenVertexArrays(1, &vertex_array_object);
   glGenBuffers(1, &vertex_buffer_object);
-  // glGenBuffers(1, &element_buffer_object);
+  glGenTextures(1, &texture);
+  glGenBuffers(1, &element_buffer_object);
   
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
   glBindVertexArray(vertex_array_object);
@@ -153,21 +156,46 @@ void Window::showWindow()
   // three options: 
   // - GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times
   // - GL_STATIC_DRAW: the data is set only once and used many times
-  // - GL_DYNAMIC_DRAW: the data is changed a lot and used many times.
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  // - GL_DYNAMIC_DRAW: the data is changed a lot and user, which then passes those to the fragment shader that neat6 * sizeof(float), (void*)0);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle_vertices), rectangle_vertices, GL_STATIC_DRAW);
 
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-  
-  // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+  // position attribute 
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-
   // color attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
   glEnableVertexAttribArray(1);
+  // texture cood attribute
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+
+
+  int width, height, nrChannels;
+  unsigned char* data = stbi_load("resources/images/cat_image.jpg", &width, &height, &nrChannels, 0);
+
+  if(!data) 
+  {
+    cout << "Error. failed to read the image "<<endl;
+  }
+
+  // texture settings 
+  glBindTexture(GL_TEXTURE_2D, texture);
+  // set texture options
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+  glGenerateMipmap(GL_TEXTURE_2D);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  stbi_image_free(data);
+
   glBindVertexArray(0);  
 
   float seed = rand() % 1;
@@ -187,10 +215,13 @@ void Window::showWindow()
     float red_value = (cos(time_value) / 2.0f);
     float blue_value = sin(time_value);
 
+    // bind texture
+    glBindTexture(GL_TEXTURE_2D, texture);
+
     myShader.use();
     glBindVertexArray(vertex_array_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glBindVertexArray(0);
 

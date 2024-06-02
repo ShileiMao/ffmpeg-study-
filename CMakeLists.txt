@@ -40,6 +40,7 @@ list(APPEND SOURCES
   src/gui/Window.cpp
   src/gui/gl/Shader.hpp
   src/gui/gl/Shader.cpp
+  src/utils/stb_image.h
 )
 add_executable(player ${SOURCES})
 
@@ -52,4 +53,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tests/resources/gl/shaders/fragment.f
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tests/resources/gl/shaders/vertex.vs
   ${CMAKE_CURRENT_BINARY_DIR}/resources/gl/shaders/vertex.vs COPYONLY
+)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tests/cat_image.jpg
+  ${CMAKE_CURRENT_BINARY_DIR}/resources/images/cat_image.jpg COPYONLY
 )
