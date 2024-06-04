@@ -8,7 +8,7 @@ add_subdirectory(lib/ffmpeg)
 
 add_subdirectory(lib/glad)
 # add glfw folder into the build
-# add_subdirectory(lib/glfw)
+add_subdirectory(lib/glfw)
 
 # add_definitions(-DGL_SILENCE_DEPRECATION)
 
